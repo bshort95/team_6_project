@@ -5,17 +5,12 @@ from _thread import *
 import sys
 
 
-server = "10.49.58.140"  #initialize as a string
+server = ""  #enter the ip number
 port = 5555  #intialize as an integer 
 
 #set up socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-#Prototype code to create a game
-#dynamic variables
-#balls = []
-#height = 500
-#width = 500
 
 #1
 #bind server to socket
@@ -37,19 +32,6 @@ def read_pos(str):
 def make_pos(tup):
     return str(tup[0]) + "," + str(tup[1])
 
-#prototype Code for a game
-"""
-def create_balls(balls, n):
-    for i in range(n):
-        while True:
-            x = random.randrange(0, width)
-            y = random.randrange(0, height)
-            
-            if stop:
-                break
-
-        balls.append((x, y, (0, 0, 0)))
-"""
 
 pos = [(20, 380), (1480, 380)]
 
@@ -92,3 +74,4 @@ while True:
 
     start_new_thread(threaded_client, (conn, currentPlayer))
     currentPlayer += 1
+
