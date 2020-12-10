@@ -6,16 +6,10 @@ class Maze:
         self.size = size
         self.connect = Connected((((size*3)+2)*((size*3)+2)))
         self.start_c = 0
-        self.term1 = 0
-        self.term2 = 0
-        self.term3 = 0
         self.end_c = 0
         self.base = [[Shape("temp",[[1,1,1],[1,1,1],[1,1,1]],False,False) for x in range(0, size)] for y in range(0,size)]
         self.maze = [[ 1 for x in range(0,((size *3) +2))] for y in range(0,((size *3) +2))]
                
-
-
-
         
     def base_maze_builder(self):
        
@@ -132,7 +126,7 @@ class Maze:
         starty = 0
         startx = midpoint
 
-        endy = self.size*3 + 1
+        endy = (self.size*3) + 1
         endx = midpoint
         
 
@@ -143,37 +137,19 @@ class Maze:
         self.maze[endx][endy-1] = 0 
         self.maze[endx][endy-2] = 0 
 
-        self.connect.connect(((startx - 1) *((self.size*3) + 2))+(starty), (startx -1)*((self.size*3) + 2)+(starty+1))
-        self.connect.connect(((endx - 1)*((self.size*3) + 2))+(endy-1), (endx -1) *((self.size*3) + 2) + (endy))
+        self.connect.connect(((startx * ((self.size*3) + 2))+ starty),((startx * ((self.size*3) + 2))+starty)+1)
+        self.connect.connect(((endx * ((self.size*3) + 2))+ endy),((endx * ((self.size*3) + 2))+endy)-1)
         
-        self.start_c = ((startx - 1) *((self.size*3) + 2))+(starty)
-        self.end_c = ((endx -1) *((self.size*3) + 2)) + (endy)
+        self.start_c = ((startx * ((self.size*3) + 2))+ starty)
+        self.end_c = ((endx * ((self.size*3) + 2))+ endy)
 
         
-        terminalx1 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        terminaly1 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        self.maze[terminalx1][terminaly1] = 3
-
-        self.term1 = ((terminalx1 - 1) *((self.size*3) + 2))+(terminaly1)
-
-
-        terminalx2 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        terminaly2 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        self.maze[terminalx2][terminaly2] = 3
-
-        self.term2 = ((terminalx2 - 1) *((self.size*3) + 2))+(terminaly2)
-
-        terminalx3 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        terminaly3 = random.randrange( 4 ,(((self.size * 3) + 2)-4))
-        self.maze[terminalx3][terminaly3] = 3
-        
-        self.term3 = ((terminalx3 - 1) *((self.size*3) + 2))+(terminaly3)
-    
+       
 
 
     def dis_maze(self):
-         for y in range(0,((self.size*3)+2)):
-            for x in range(0,((self.size*3)+2)):
+         for x in range(0,((self.size*3)+2)):
+            for y in range(0,((self.size*3)+2)):
                 print(self.maze[x][y], end = ' ')
             print('\n')
 
@@ -182,30 +158,22 @@ class Maze:
         return self.maze
                 
     def maze_runner(self):
-         for y in range(0, ((self.size*3)+2)):
-            for x in range(0, ((self.size*3)+2)):
-                if y != ((self.size*3)+1) and x != ((self.size*3)+1):
-                    if y != ((self.size*3)+1):    
-                        #print(y+1)           
+        size = ((self.size *3) + 2)
+        for y in range(0, size):
+            for x in range(0, size):
+                if y != size -1 and x != size -1 :
+                    if y != (size -1):              
                         if self.maze[x][y] == 0 and self.maze[x][y+1] == 0:
-                            self.connect.connect(((x-1) *((self.size*3) +2) + y), (x-1) *((self.size*3) +2) + y+1)
+                            self.connect.connect(((x * size)+y),((x * size)+y)+1)
                     if x != ((self.size*3)+1):
-                        #print(x)
-                        #print(y)
-                        #print(x *((self.size*3) +2) + y)
                         if self.maze[x][y] == 0 and self.maze[x+1][y] == 0:
-                            self.connect.connect((x-1) *((self.size*3) +2) + y,(x *((self.size*3) +2) + y))
-                #print((x)*(self.size*3) + (y))    
+                            self.connect.connect(((x * size)+y),((x * size)+y)+ size)
 
     def is_maze_passable(self):
         
         self.maze_runner()
-        return self.connect.isConnected(self.start_c,self.end_c) and self.connect.isConnected(self.start_c,self.term1) and self.connect.isConnected(self.start_c,self.term2) and self.connect.isConnected(self.start_c,self.term3)
+        return self.connect.isConnected(self.start_c,self.end_c)
         
-
-        
-
-
 
 
 
