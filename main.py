@@ -5,7 +5,7 @@ from _thread import *
 from network import Network
 
 
-
+# settiing up the game
 size = 12
 pygame.init()
 screen = pygame.display.set_mode((1500,760))
@@ -22,7 +22,7 @@ shadow = pygame.image.load('shadow.png')
 
 
 
-
+# building the maze and making sure it is passable
 
 bob = Maze(size)
 joe = Maze(size)
@@ -31,12 +31,8 @@ bob.maze_builder()
 while bob.is_maze_passable() == False: 
     bob.base_maze_builder()
     bob.maze_builder()
-
-#print(bob.is_maze_passable())
+    
 l_maze = bob.get_maze()
-
-
-
 r_maze = bob.get_maze()
 
 l_maze[18][37]=0
@@ -49,6 +45,8 @@ r_maze[18][1]=0
 r_maze[20][0]=0
 r_maze[20][1]=0
 
+
+# player class
 class Player():
     def __init__(self, x, y, width, height, ammo, color):
         self.x = x
@@ -65,21 +63,21 @@ class Player():
         screen.blit(p_img,(self.x - 6, self.y - 6))
 
     
-    def move(self, key):
+    def move(self, key1 , key2):
         keys = pygame.key.get_pressed()
 
         
 
-        if keys[pygame.K_LEFT] and key != 1 :
+        if keys[pygame.K_LEFT] and key1 != 1 :
             self.x -= self.vel
-
-        if keys[pygame.K_RIGHT] and key != 2 :
+        
+        if keys[pygame.K_RIGHT] and key1 != 2 :
             self.x += self.vel
 
-        if keys[pygame.K_UP] and key != 3 :
+        if keys[pygame.K_UP] and key2 != 1 :
             self.y -= self.vel
 
-        if keys[pygame.K_DOWN] and key != 4 :
+        if keys[pygame.K_DOWN] and key2 != 2 :
             self.y += self.vel
 
         self.update()
@@ -104,53 +102,67 @@ def redrawWindow(screen, player, player2):
     player2.draw(screen)
    
 
+# check colisions on the x axis
+def checkColx(map, pos_x, pos_y, size):
 
-def checkCol(map, pos_x, pos_y, size):
-    
     if pos_x > 760:
         pos_x = pos_x - 740
-    #print(pos_x)
-    #print(pos_y)
-    size = (size *3) + 2
+    size = (size * 3) + 2
     pos_x = pos_x - 20
     pos_y = pos_y - 20
     var = 0
     for y in range(size):
         for x in range(size):
-            
-            if map[y][x] == 1  and (pos_x - 1 < x* 20 and pos_x - 1> (x * 20) - 20) and (pos_y < y* 20 and pos_y > (y * 20) - 20):
-                screen.blit(terminal,(x*20,y*20))
+            if map[y][x] == 1  and (pos_x - 1 < x *20 and pos_x - 1> (x * 20) - 20) and (pos_y < y* 20 and pos_y > (y * 20) - 20):
+               
                 var = 1
+                p.x += 2
 
             if map[y][x] == 1  and (pos_x + 15 < x* 20 and pos_x + 15 > (x * 20) - 20) and (pos_y < y* 20 and pos_y > (y * 20) - 20):
-                screen.blit(terminal,(x*20,y*20))
-                
+               
                 var = 2
-            
-            if map[y][x] == 1  and (pos_y - 1 < y* 20 and pos_y - 1 > (y * 20) - 20) and (pos_x < x* 20 and pos_x > (x * 20) - 20):
-                screen.blit(terminal,(x*20,y*20))    
-                var = 3
+                p.x -= 2
+    return var
+
+
+
+# check colisions on the y axis
+
+def checkColy(map, pos_x, pos_y, size):
+
+    if pos_x > 760:
+        pos_x = pos_x - 740
+    size = (size * 3) + 2
+    pos_x = pos_x - 20
+    pos_y = pos_y - 20
+    var = 0
+    for y in range(size):
+        for x in range(size):
+            if map[y][x] == 1  and (pos_y - 1 < y *20 and pos_y - 1 > (y * 20) - 20) and (pos_x < x* 20 and pos_x > (x * 20) - 20):
+                
+                var = 1
+                p.y += 2
 
             if map[y][x] == 1  and (pos_y + 15 < y* 20 and pos_y + 15 > (y * 20) - 20) and (pos_x < x* 20 and pos_x > (x * 20) - 20):
-                screen.blit(terminal,(x*20,y*20))    
-                var = 4 
-    return var        
+               
+                var = 2 
+                p.y -=2    
+    return var
 
 
-
+# setting up network
 n = Network()
 startPos = read_pos(n.getPos())
 p = Player(startPos[0], startPos[1], 15, 15, 0, (0,255,34))
 p2 = Player(0, 0, 15, 15, 0, (200,0,255))
-#obj = Player((random.randrange(0, width)), (random.randrange(0, height)), 50, 50, 0, (0, 0, 0))
+
 
 
 
 clock = pygame.time.Clock()
 
 
-
-
+# game loop
 while True:
     clock.tick(60)
     p2Pos = read_pos(n.send(make_pos((p.x, p.y))))
@@ -169,7 +181,7 @@ while True:
   
     
 
-
+    #draws map on screen
     for y in range(0, (size*3)+2):
         for x in range(0, (size*3)+2):
             if l_maze[x][y] == 1:
@@ -181,14 +193,11 @@ while True:
                 screen.blit(walls,((y*20)+740,x*20))    
             elif r_maze[x][y] == 3:
                 screen.blit(terminal,((y*20)+740,x*20))
-
-
-   # screen.blit(shadow,(0,0))      
-    p.move(checkCol(l_maze,p.x,p.y,size))
+     
+    p.move(checkColx(l_maze,p.x,p.y,size),checkColy(l_maze,p.x,p.y,size))
     
     p2.update()
     redrawWindow(screen, p, p2)
-
 
     pygame.display.update()
     
